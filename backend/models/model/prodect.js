@@ -13,18 +13,27 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
-        type: String,
-        required: true
-    },
-    price:{
+    image: [
+        {
+            image_url: {
+                type: String,
+                required: true,
+            },
+            image_key: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+
+    price: {
         type: Number,
-        min:10,
-        max:5000,
-        required:true
+        min: 10,
+        max: 5000,
+        required: true
     }
 }, { timestamps: true });
 
-const productModel=mongoose.model('product',productSchema);
+const productModel = mongoose.model('product', productSchema);
 
 export default productModel;
