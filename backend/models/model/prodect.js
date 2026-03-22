@@ -13,18 +13,25 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: [
-        {
-            image_url: {
-                type: String,
-                required: true,
-            },
-            image_key: {
-                type: String,
-                required: true,
-            },
-        },
-    ],
+    image: {
+        type: [
+            {
+                image_url: {
+                    type: String,
+                    required: true,
+                },
+                image_key: {
+                    type: String,
+                    required: true,
+                },
+            }
+        ],
+        required: true,
+        validate: [
+            (val) => Array.isArray(val) && val.length > 0 && val.length <= 2,
+            "You must provide 1 to 2 images"
+        ]
+    },
 
     price: {
         type: Number,
