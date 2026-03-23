@@ -38,6 +38,11 @@ const productSchema = new mongoose.Schema({
         min: 10,
         max: 5000,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending"
     }
 }, { timestamps: true });
 

@@ -5,7 +5,7 @@ import upload from '../imageCloud/upload.js';
 import { uploadToCloudinary } from '../utils/cloudUpload.js';
 import deleteProduct from '../imageCloud/delete.js';
 
-const route = express.Router();
+const product = express.Router();
 
 {/*<form action="/stats" enctype="multipart/form-data" method="post">
   <div class="form-group">
@@ -15,10 +15,10 @@ const route = express.Router();
   </div>
 </form>*/}
 
-route.post('/product', upload.array('product_image', 2), async (req, res) => {
+product.post('/', upload.array('product_image', 2), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ message: "No files uploaded" });
+            return res.status(400).json({ message: "Upload product image" });
         }
         // upload all files
         const uploads = req.files.map(file =>
@@ -49,7 +49,7 @@ route.post('/product', upload.array('product_image', 2), async (req, res) => {
     }
 })
 
-route.delete('/product/:id', async (req, res) => {
+product.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -67,7 +67,7 @@ route.delete('/product/:id', async (req, res) => {
         await productModel.findByIdAndDelete(id);
 
         res.status(200).json({
-            message: "Product and images deleted successfully",
+            message: "Product deleted successfully",
         });
 
     } catch (e) {
@@ -78,9 +78,14 @@ route.delete('/product/:id', async (req, res) => {
     }
 });
 
-route.patch('/product/:id', upload.array('product_image', 2), async (req, res) => {
+product.patch('/:id', upload.array('product_image', 2), async (req, res) => {
     try {
         const { id } = req.params;
+        const files=req.files || [];
+
+        if(!req.body && files.length<1){
+            return res.status(400).json({ message: "No change data found" });
+        }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid product ID" });
@@ -95,7 +100,7 @@ route.patch('/product/:id', upload.array('product_image', 2), async (req, res) =
         delete updates.product_image;
         Object.assign(product, updates);
 
-        if (req.files && req.files.length > 0) {
+        if (files && files.length > 0) {
             await deleteProduct(product);
 
             const uploads = req.files.map(file => uploadToCloudinary(file.buffer));
@@ -107,6 +112,7 @@ route.patch('/product/:id', upload.array('product_image', 2), async (req, res) =
             }));
         }
 
+        product.status="pending";
         await product.save();
 
         res.status(200).json({
@@ -119,7 +125,7 @@ route.patch('/product/:id', upload.array('product_image', 2), async (req, res) =
     }
 });
 
-route.get('/product/:id', async (req, res) => {
+product.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -139,9 +145,17 @@ route.get('/product/:id', async (req, res) => {
     }
 })
 
-route.get('/product', async (req, res) => {
+product.get('/', async (req, res) => {
     try {
-        const allProducts = await productModel.find({});
+        const findByStatus = req.query.status;
+
+        let filter = {};
+
+        if (findByStatus !== undefined) {
+            filter.status = findByStatus;
+        }
+
+        const allProducts = await productModel.find(filter).sort({ createdAt: -1 });
 
         if (!allProducts) {
             return res.status(404).json({ message: "user has no published product" });
@@ -153,4 +167,4 @@ route.get('/product', async (req, res) => {
     }
 })
 
-export default route;
+export default product;
