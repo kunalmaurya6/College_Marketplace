@@ -1,9 +1,10 @@
 import express from 'express';
-import productModel from '../models/model/prodect.js';
+import productModel from '../models/model/prodectModel.js';
 import mongoose from 'mongoose';
-import upload from '../imageCloud/upload.js';
-import { uploadToCloudinary } from '../utils/cloudUpload.js';
-import deleteProduct from '../imageCloud/delete.js';
+import upload from '../utils/uploads/upload.js';
+import { uploadToCloudinary } from '../utils/uploads/cloudUpload.js';
+import deleteProduct from '../utils/uploads/delete.js';
+import validateProduct from '../models/model/validation/productValidation.js';
 
 const product = express.Router();
 
@@ -20,10 +21,20 @@ product.post('/', upload.array('product_image', 2), async (req, res) => {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: "Upload product image" });
         }
+
+        const { error, value } = validateProduct.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                error: error.details.map(err => err.message)
+            });
+        }
+
         // upload all files
         const uploads = req.files.map(file =>
             uploadToCloudinary(file.buffer)
         );
+
         const results = await Promise.all(uploads);
 
         // extract useful data
@@ -34,9 +45,9 @@ product.post('/', upload.array('product_image', 2), async (req, res) => {
             }
         )
         );
-        const data = req.body;
-        data.image = images;
-        const response = await productModel(data);
+
+        value.image = images;
+        const response = await productModel(value);
 
         await response.save();
 
@@ -81,9 +92,9 @@ product.delete('/:id', async (req, res) => {
 product.patch('/:id', upload.array('product_image', 2), async (req, res) => {
     try {
         const { id } = req.params;
-        const files=req.files || [];
+        const files = req.files || [];
 
-        if(!req.body && files.length<1){
+        if (!req.body && files.length < 1) {
             return res.status(400).json({ message: "No change data found" });
         }
 
@@ -112,7 +123,7 @@ product.patch('/:id', upload.array('product_image', 2), async (req, res) => {
             }));
         }
 
-        product.status="pending";
+        product.status = "pending";
         await product.save();
 
         res.status(200).json({

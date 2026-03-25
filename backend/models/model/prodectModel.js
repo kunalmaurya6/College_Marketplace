@@ -4,10 +4,16 @@ const productSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
+        maxlength: [100, "Title cannot exceed 100 characters"]
     },
+
     category: {
         type: String,
-        required: true
+        required: true,
+        enum: {
+            values: ["electronics", "fashion", "books", "home"],
+            message: "Category must be one of electronics, fashion, books, home"
+        }
     },
     desc: {
         type: String,
@@ -28,16 +34,16 @@ const productSchema = new mongoose.Schema({
         ],
         required: true,
         validate: [
-            (val) => Array.isArray(val) && val.length > 0 && val.length <= 2,
-            "You must provide 1 to 2 images"
+            (val) => Array.isArray(val) && val.length > 0 && val.length < 5,
+            "You must provide 1 to 4 images"
         ]
     },
 
     price: {
         type: Number,
-        min: 10,
+        min: 5,
         max: 5000,
-        required: true
+        required: true,
     },
     status: {
         type: String,

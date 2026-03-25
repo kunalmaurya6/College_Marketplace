@@ -1,4 +1,4 @@
-import cloudinary from "../imageCloud/cloudinary.js";
+import cloudinary from "./cloudinary.js";
 
 const deleteProduct=async (product) => {
     const publicIds = product.image.map(img => img.image_key);
