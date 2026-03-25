@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import upload from '../utils/uploads/upload.js';
 import { uploadToCloudinary } from '../utils/uploads/cloudUpload.js';
 import deleteProduct from '../utils/uploads/delete.js';
-import validateProduct from '../models/model/validation/productValidation.js';
+import validateProduct from '../models/validation/productValidation.js';
 
 const product = express.Router();
 

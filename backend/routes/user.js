@@ -7,21 +7,27 @@ const user = express.Router();
 //all products
 user.get('/products', async (req, res) => {
     try {
-        const findByStatus = req.query.status;
+        const limit = 10;
+        const cursor = req.query.cursor;
 
-        let filter = {};
+        let query = { status: "approved" };
 
-        if (findByStatus !== undefined) {
-            filter.status = findByStatus;
+        if (cursor) {
+            query._id = { $lt: cursor };
         }
 
-        const allProducts = await productModel.find(filter).sort({ createdAt: -1 });
+        const products = await productModel.find(query)
+            .sort({ createdAt: -1 })
+            .limit(limit);
 
-        if (!allProducts) {
-            return res.status(404).json({ message: "user has no published product" });
+        if (!products) {
+            return res.status(404).json({ message: "No product has approved" });
         }
 
-        res.status(200).json({ allProducts });
+        res.status(200).json({
+            products,
+            nextCursor: products.length ? products[products.length - 1]._id : null
+        });
     } catch (e) {
         res.status(500).json({ message: "Server error", error: e.message });
     }
@@ -71,27 +77,6 @@ user.get('/seller', async (req, res) => {
 
 //seller products by seller id
 user.get('/seller/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Invalid ID format" });
-        }
-
-        const data = await productModel.findById(id);
-
-        if (!data) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-
-        res.status(200).json({ data });
-    } catch (e) {
-        res.status(500).json({ message: "Server error", error: e.message });
-    }
-})
-
-//seller products by seller id
-user.get('/catogeery', async (req, res) => {
     try {
         const { id } = req.params;
 
