@@ -47,6 +47,7 @@ product.post('/', upload.array('product_image', 2), async (req, res) => {
         );
 
         value.image = images;
+        value.status = "pending";
         const response = await productModel(value);
 
         await response.save();
@@ -156,26 +157,28 @@ product.get('/:id', async (req, res) => {
     }
 })
 
-product.get('/', async (req, res) => {
-    try {
-        const findByStatus = req.query.status;
+//give all of the product by seller id
 
-        let filter = {};
+//product.get('/', async (req, res) => {
+//    try {
+//        const findByStatus = req.query.status;
 
-        if (findByStatus !== undefined) {
-            filter.status = findByStatus;
-        }
+//        let filter = {};
 
-        const allProducts = await productModel.find(filter).sort({ createdAt: -1 });
+//        if (findByStatus !== undefined) {
+//            filter.status = findByStatus;
+//        }
 
-        if (!allProducts) {
-            return res.status(404).json({ message: "user has no published product" });
-        }
+//        const allProducts = await productModel.find(filter).sort({ createdAt: -1 });
 
-        res.status(200).json({ allProducts });
-    } catch (e) {
-        res.status(500).json({ message: "Server error", error: e.message });
-    }
-})
+//        if (!allProducts) {
+//            return res.status(404).json({ message: "user has no published product" });
+//        }
+
+//        res.status(200).json({ allProducts });
+//    } catch (e) {
+//        res.status(500).json({ message: "Server error", error: e.message });
+//    }
+//})
 
 export default product;
