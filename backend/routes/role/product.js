@@ -1,10 +1,10 @@
 import express from 'express';
-import productModel from '../models/model/prodectModel.js';
+import productModel from '../../models/model/prodectModel.js';
 import mongoose from 'mongoose';
-import upload from '../utils/uploads/upload.js';
-import { uploadToCloudinary } from '../utils/uploads/cloudUpload.js';
-import deleteProduct from '../utils/uploads/delete.js';
-import validateProduct from '../models/validation/productValidation.js';
+import upload from '../../utils/uploads/upload.js';
+import { uploadToCloudinary } from '../../utils/uploads/cloudUpload.js';
+import deleteProduct from '../../utils/uploads/delete.js';
+import validateProduct from '../../models/validation/productValidation.js';
 
 const product = express.Router();
 

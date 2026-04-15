@@ -1,9 +1,7 @@
 import express from 'express'
 import 'dotenv/config'
-import product from './routes/product.js'
-import admin from './routes/admin.js'
-import user from './routes/user.js'
 import mongoose from 'mongoose'
+import routes from './routes/route.js'
 
 const app = express()
 
@@ -12,9 +10,7 @@ const DB = process.env.DB
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/product',product);
-app.use('/api/admin',admin);
-app.use('/api',user);
+app.use('/api',routes);
 
 const connectDB = async () => {
   try {

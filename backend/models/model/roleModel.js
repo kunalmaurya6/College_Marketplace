@@ -1,26 +1,27 @@
 import mongoose, { Schema, model } from "mongoose";
 
-const imageSchema = new Schema(
-    {
-        image_url: {
-            type: String,
-            required: true,
-        },
-        image_key: {
-            type: String,
-            required: true,
-        },
-    },
-    { _id: false }
-);
+// const imageSchema = new Schema(
+//     {
+//         image_url: {
+//             type: String,
+//             required: true,
+//         },
+//         image_key: {
+//             type: String,
+//             required: true,
+//         },
+//     },
+//     { _id: false }
+// );
 
 const roleSchema = new Schema(
     {
-        name: {
-            type: String,
-            required: true,
-            maxlength: [20, "Name cannot exceed 20 characters"],
-        },
+        // userName: {
+        //     type: String,
+        //     required: true,
+        //     maxlength: [20, "Name cannot exceed 20 characters"],
+        //     unique:true
+        // },
 
         email: {
             type: String,
@@ -43,24 +44,21 @@ const roleSchema = new Schema(
             enum: {
                 values: ["seller", "user", "admin"],
                 message: "Role must be one of seller, user, admin",
-            },
-            default: "user",
+            }
         },
 
-        image: {
-            type: [imageSchema],
-            required: true,
-            validate: [
-                {
-                    validator: (val) => val.length === 1, // exactly one image
-                    message: "User must have exactly one image",
-                },
-            ],
-        },
-    },
-    { timestamps: true }
+        // image: {
+        //     type: [imageSchema],
+        //     validate: [
+        //         {
+        //             validator: (val) => val.length === 1, // exactly one image
+        //             message: "User must have exactly one image",
+        //         },
+        //     ],
+        // },
+    }
 );
 
-const roleModel = model('Role', roleSchema);
+const roleModel = model('role', roleSchema);
 
 export default roleModel;

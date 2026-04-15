@@ -1,14 +1,14 @@
 import Joi from "joi";
 
 // Joi validation schema
-export const roleValidationSchema = Joi.object({
-  name: Joi.string()
-    .max(20)
-    .required()
-    .messages({
-      "string.max": "Name cannot exceed 20 characters",
-      "any.required": "Name is required",
-    }),
+const roleValidationSchema = Joi.object({
+  // userName: Joi.string()
+  //   .max(20)
+  //   .required()
+  //   .messages({
+  //     "string.max": "Name cannot exceed 20 characters",
+  //     "any.required": "Name is required",
+  //   }),
 
   email: Joi.string()
     .email()
@@ -37,22 +37,24 @@ export const roleValidationSchema = Joi.object({
       "any.required": "Role is required",
     }),
 
-  image: Joi.array()
-    .items(
-      Joi.object({
-        image_url: Joi.string()
-          .required()
-          .messages({ "any.required": "Image URL is required" }),
-        image_key: Joi.string()
-          .required()
-          .messages({ "any.required": "Image key is required" }),
-      })
-    )
-    .min(1)
-    .max(1)
-    .required()
-    .messages({
-      "array.min": "At least one image is required",
-      "array.max": "Only one image is allowed",
-    }),
+  // image: Joi.array()
+  //   .items(
+  //     Joi.object({
+  //       image_url: Joi.string()
+  //         .required()
+  //         .messages({ "any.required": "Image URL is required" }),
+  //       image_key: Joi.string()
+  //         .required()
+  //         .messages({ "any.required": "Image key is required" }),
+  //     })
+  //   )
+  //   .min(1)
+  //   .max(1)
+  //   .required()
+  //   .messages({
+  //     "array.min": "At least one image is required",
+  //     "array.max": "Only one image is allowed",
+  //   }),
 });
+
+export default roleValidationSchema
