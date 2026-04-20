@@ -5,8 +5,13 @@ import upload from '../../utils/uploads/upload.js';
 import { uploadToCloudinary } from '../../utils/uploads/cloudUpload.js';
 import deleteProduct from '../../utils/uploads/delete.js';
 import validateProduct from '../../models/validation/productValidation.js';
+// import serverChat from '../chat/serverChat.js'
 
 const product = express.Router();
+
+// product.use('/chat',serverChat);
+
+
 
 {/*<form action="/stats" enctype="multipart/form-data" method="post">
   <div class="form-group">
