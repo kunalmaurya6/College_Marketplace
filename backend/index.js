@@ -41,6 +41,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-server.listen(PORT, async () => {
-    console.log("Server running on: ", PORT);
-})
+// server.listen(PORT, async () => {
+//     console.log("Server running on: ", PORT);
+// })
