@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import { Schema,model } from "mongoose";
+// import 
 
-const productSchema = new mongoose.Schema({
+const productSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -49,9 +51,13 @@ const productSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "approved", "rejected"],
         default: "pending"
+    },
+    seller: {
+        type:Schema.Types.ObjectId,
+        ref: 'roleModel'
     }
 }, { timestamps: true });
 
-const productModel = mongoose.model('product', productSchema);
+const productModel = model('product', productSchema);
 
 export default productModel;

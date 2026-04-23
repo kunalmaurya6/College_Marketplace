@@ -1,25 +1,31 @@
 import express from 'express'
 import 'dotenv/config'
-import mongoose from 'mongoose'
+import connectDB from './utils/DB/DB.js'
 import routes from './routes/route.js'
+import httpServer from 'http'
+import chatServer from './routes/chat/serverChat.js'
+import cors from 'cors'
 
 const app = express()
 
+const server=httpServer.createServer(app);
+
+chatServer(server);
+
 const PORT = process.env.PORT
-const DB = process.env.DB
+
+connectDB();
+chatServer(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api',routes);
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(DB);
-    console.log('MongoDB Connected successfully!');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-  }
-};
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
+app.use('/api',routes);
 
 // 404 handler
 app.use((req, res, next) => {
@@ -35,7 +41,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, async () => {
-    connectDB();
+server.listen(PORT, async () => {
     console.log("Server running on: ", PORT);
 })
