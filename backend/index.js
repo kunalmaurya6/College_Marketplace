@@ -4,6 +4,7 @@ import connectDB from './utils/DB/DB.js'
 import routes from './routes/route.js'
 import httpServer from 'http'
 import chatServer from './routes/chat/serverChat.js'
+import cors from 'cors'
 
 const app = express()
 
@@ -18,6 +19,12 @@ chatServer(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
 app.use('/api',routes);
 
 // 404 handler
