@@ -1,0 +1,39 @@
+import React, { useState } from 'react'
+import Product from './Product'
+import { NavLink } from 'react-router-dom'
+
+const Listings = () => {
+  const [order, setOrder] = useState("all")
+  const handleChange = (e) => {
+    // console.log(e.target.value)
+    setOrder(e.target.value)
+  }
+  
+  return (
+    <div className='w-full h-full p-5 flex flex-col gap-2 px-10'>
+      <div className='w-full h-2/25 flex justify-between'>
+        <h1 className='text-2xl font-bold'>My Listings</h1>
+        <div className=''>
+          <select className='text-blue-500 border-2 border-blue-500 rounded-lg' onChange={handleChange} value={order}>
+            <option value="all">View All</option>
+            <option value="approved">Approved</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+      {/* select by */}
+      {/* <div className='w-full h-1/20 bg-red-100 flex justify-start items-center gap-10'>
+        <NavLink className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-blue-200" : ""}`}>All Listing</NavLink>
+        <NavLink className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-blue-200" : ""}`}>Approved</NavLink>
+        <NavLink className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-blue-200" : ""}`}>Pending</NavLink>
+        <NavLink className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-blue-200" : ""}`}>Rejected</NavLink>
+      </div> */}
+      <div className='w-full h-22/25'>
+        <Product order={order} />
+      </div>
+    </div>
+  )
+}
+
+export default Listings

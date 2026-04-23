@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 
 const Sidebar = () => {
   return (
-    <div className='w-[20%] h-full bg-gray-100 flex flex-col gap-2 p-4'>
+    <div className='w-full h-full bg-gray-100 flex flex-col gap-2 p-4'>
       <NavLink className={({ isActive }) => `p-2 rounded-lg ${isActive ? "bg-blue-200" : ""}`} to="."
         end>
         <i className="fa-solid fa-border-all"></i>Listings
