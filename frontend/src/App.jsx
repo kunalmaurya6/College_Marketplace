@@ -3,6 +3,7 @@ import Seller from './components/seller/Seller'
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import Chat from './components/chat/Chat'
 import AppRoutes from './components/routes/AppRoutes'
+import { ToastContainer } from 'react-toastify';
 function App() {
 
   return (
@@ -18,6 +19,11 @@ function App() {
         <Route path="seller/*" element={<Seller />} />
       </Routes> */}
       <AppRoutes/>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        theme="light"
+      />
     </BrowserRouter>
   )
 }

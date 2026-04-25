@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+const categories = ["electronics", "fashion", "books", "homedecor"];
 
 const AddProduct = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     desc: "",
@@ -10,38 +16,35 @@ const AddProduct = () => {
   });
 
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // handle text input
+  // input
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // handle images (max 2, no replace issue)
+  // images
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
-    let updatedImages = [...images, ...files];
-
-    if (updatedImages.length > 2) {
-      alert("Only 2 images allowed");
-      updatedImages = updatedImages.slice(0, 2);
+    let updated = [...images, ...files];
+    if (updated.length > 2) {
+      toast.error("Only 2 images allowed");
+      updated = updated.slice(0, 2);
     }
 
-    setImages(updatedImages);
-  };
-
-  // remove image
-  const handleRemoveImage = (index) => {
-    const updated = images.filter((_, i) => i !== index);
     setImages(updated);
   };
 
-  // submit form
+  // remove
+  const handleRemoveImage = (index) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  // submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const data = new FormData();
@@ -54,130 +57,126 @@ const AddProduct = () => {
         data.append("product_image", img);
       });
 
-      const res = await axios.post(
-        "http://localhost:8080/api/product",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await axios.post("/api/sell/product", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      alert("Product uploaded!");
-      console.log(res.data);
+      toast.success("Product uploaded 🚀");
 
-      // reset form
-      // setFormData({
-      //   title: "",
-      //   desc: "",
-      //   category: "",
-      //   price: "",
-      // });
-      // setImages([]);
+      setTimeout(() => {
+        navigate("/seller");
+      }, 1500);
 
     } catch (err) {
       console.error(err);
-      // alert("Upload failed");
+      toast.error("Upload failed ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-h-full flex items-center justify-center px-4">
-      <div className="w-full max-w-xl bg-white p-8 rounded-2xl shadow-lg">
+    <div className="flex min-h-full w-full items-center justify-center bg-gray-50 px-4 py-6 sm:py-10">
 
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Add New Product
-        </h2>
+      {/* CARD */}
+      <div className="flex w-full max-w-xl flex-col rounded-2xl bg-white shadow-lg">
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* HEADER */}
+        <div className="p-5 sm:p-6">
+          <h2 className="text-center text-xl font-semibold text-gray-800 sm:text-2xl">
+            Add New Product
+          </h2>
+        </div>
+
+        {/* FORM (SCROLL ENABLED WHEN NEEDED) */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex-1 space-y-5 overflow-y-auto p-5 sm:p-6" style={{scrollbarWidth:"none"}}
+        >
 
           {/* Title */}
-          <div>
-            <label className="text-sm text-gray-600">Product Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="e.g. Wireless Headphones"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Product title"
+            className="w-full rounded-lg border p-3 outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
 
           {/* Description */}
-          <div>
-            <label className="text-sm text-gray-600">Description</label>
-            <textarea
-              name="desc"
-              value={formData.desc}
-              onChange={handleChange}
-              placeholder="Write product details..."
-              rows="4"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <textarea
+            name="desc"
+            value={formData.desc}
+            onChange={handleChange}
+            placeholder="Description"
+            rows="4"
+            className="w-full rounded-lg border p-3 outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
 
           {/* Category */}
-          <div>
-            <label className="text-sm text-gray-600">Category</label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              placeholder="e.g. Electronics"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full rounded-lg border p-3 outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
 
           {/* Price */}
-          <div>
-            <label className="text-sm text-gray-600">Price (₹)</label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              placeholder="Enter price"
-              className="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <input
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            placeholder="Price ₹"
+            className="w-full rounded-lg border p-3 outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
 
-          {/* Image Upload */}
+          {/* Upload */}
           <div>
-            <label className="text-sm text-gray-600">Upload Images (max 2)</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full mt-2"
-              name="product_image"
-            />
+            <label className="mb-2 block text-sm text-gray-600">
+              Upload Images (max 2)
+            </label>
 
-            {/* Preview */}
-            <div className="flex gap-4 mt-4">
+            <label className="flex h-28 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-300 transition hover:bg-gray-50">
+              <span className="text-gray-500">Click to upload</span>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+
+            {/* IMAGE PREVIEW (AUTO EXPAND + SCROLL WHEN NEEDED) */}
+            <div className="mt-4 flex flex-wrap gap-3">
               {images.map((img, index) => (
                 <div
                   key={index}
-                  className="relative w-32 h-32 border rounded-xl bg-gray-50 flex items-center justify-center"
+                  className="relative h-[110px] w-[110px] overflow-hidden rounded-lg bg-gray-100"
                 >
                   <img
                     src={URL.createObjectURL(img)}
-                    alt="preview"
-                    className="max-w-full max-h-full object-contain"
+                    alt="Product preview"
+                    className="h-full w-full object-cover"
                   />
 
-                  {/* Remove button */}
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(index)}
-                    className="absolute top-1 right-1 bg-black text-white text-xs px-2 py-1 rounded"
+                    className="absolute right-1 top-1 rounded bg-black px-2 text-xs text-white"
                   >
                     ✕
                   </button>
@@ -189,9 +188,14 @@ const AddProduct = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition"
+            disabled={loading}
+            className={`w-full py-3 rounded-lg text-white font-medium transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
-            Upload Product
+            {loading ? "Uploading..." : "Upload Product"}
           </button>
 
         </form>

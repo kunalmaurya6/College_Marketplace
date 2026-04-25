@@ -83,36 +83,36 @@ const Chat = () => {
 
     return (
 
-        <div className='absolute bottom-0 right-1 flex items-end gap-2'>
-            <div className='bg-blue-200 w-[70px] h-[60px] rounded-full flex justify-center items-center' onClick={() => setToggle(!toggle)}>
-                <div className='text-[25px]'>
+        <div className='fixed bottom-3 right-3 z-40 flex max-w-[calc(100vw-1.5rem)] items-end gap-2 sm:bottom-5 sm:right-5'>
+            <div className='flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full bg-blue-200 shadow-lg sm:h-[60px] sm:w-[70px]' onClick={() => setToggle(!toggle)}>
+                <div className='text-center text-xl sm:text-[25px]'>
                     <i className="fa-regular fa-comment-dots"></i>
                     <div className='text-sm'>{toggle?"open":"close"}</div>
                 </div>
             </div>
-            <div className={`w-[400px] h-[500px] bg-[#edf6ff] rounded-lg ${toggle ? "hidden" : ""}`}>
-                <div className='w-[full] h-[15%] bg-green-100 rounded-lg p-5 flex flex-row justify-start items-center'>
+            <div className={`h-[min(500px,75vh)] w-[min(400px,calc(100vw-6rem))] rounded-lg bg-[#edf6ff] shadow-xl ${toggle ? "hidden" : ""}`}>
+                <div className='flex h-[15%] w-full flex-row items-center justify-start rounded-t-lg bg-green-100 p-4 sm:p-5'>
                     <div>
-                        <div className='h-[50px] w-[50px] bg-gray-50 rounded-full flex justify-center items-center text-[150%] mr-5'><i className="fa-solid fa-user"></i></div>
+                        <div className='mr-4 flex h-11 w-11 items-center justify-center rounded-full bg-gray-50 text-[150%] sm:mr-5 sm:h-[50px] sm:w-[50px]'><i className="fa-solid fa-user"></i></div>
                     </div>
                     <div className='text-lg'>Kunal</div>
                 </div>
 
                 {/* chat box */}
-                <div className='p-5 h-[75%] overflow-scroll '>
+                <div className='h-[75%] overflow-y-auto p-3 sm:p-5'>
                     {
-                        chats.map((chat =>
-                            <div className={`w-full flex ${chat.type === "send" ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[60%] p-1 m-1 rounded-lg flex items-end ${chat.type === "send" ? "bg-[#93C193]" : "bg-[#90CCE5]"}`}> {chat.message} <span className='ml-1 text-[10px] w-[50px]'>{chat.time}</span></div>
+                        chats.map((chat, index) =>
+                            <div key={index} className={`flex w-full ${chat.type === "send" ? "justify-end" : "justify-start"}`}>
+                                <div className={`m-1 flex max-w-[78%] items-end rounded-lg p-2 text-sm sm:max-w-[65%] ${chat.type === "send" ? "bg-[#93C193]" : "bg-[#90CCE5]"}`}> {chat.message} <span className='ml-1 w-[50px] text-[10px]'>{chat.time}</span></div>
                             </div>
-                        ))
+                        )
                     }
                 </div>
 
                 {/* input */}
-                <div className='h-[10%] w-[90%] bg-white mx-auto rounded-full flex justify-between'>
-                    <input className='w-full focus:outline-hidden p-2' type="text" name="chatinput" />
-                    <button className='w-[70px] h-[50px] text-[20px] bg-green-100 rounded-full'>
+                <div className='mx-auto flex h-[10%] w-[92%] justify-between rounded-full bg-white'>
+                    <input className='min-w-0 flex-1 rounded-full p-2 focus:outline-hidden' type="text" name="chatinput" />
+                    <button className='flex h-full w-14 shrink-0 items-center justify-center rounded-full bg-green-100 text-[20px] sm:w-[70px]'>
                         <i className="fa-regular fa-paper-plane">
                         </i>
                     </button>

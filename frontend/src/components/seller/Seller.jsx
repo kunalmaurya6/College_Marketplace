@@ -5,18 +5,15 @@ import { Outlet } from 'react-router-dom'
 
 const Seller = () => {
     return (
-        <div className='w-[100vw] h-[100vh]'>
-            <div className='w-full h-1/10'>
-                <Nav />
-            </div>
-            <div className='w-full h-9/10 flex border-t-2 border-gray-200'>
-                <div className='w-8/50 h-full'>
+        <div className='flex min-h-screen w-full flex-col bg-gray-50'>
+            <Nav />
+            <div className='flex flex-1 flex-col border-t border-gray-200 md:flex-row'>
+                <aside className='w-full md:w-64 md:shrink-0'>
                     <Sidebar />
-                </div>
-                {/* child component */}
-                <div className='w-full h-full'>
+                </aside>
+                <main className='min-w-0 flex-1'>
                     <Outlet />
-                </div>
+                </main>
             </div>
         </div>
     )

@@ -1,7 +1,7 @@
 import React from 'react'
-import CommingSoon from '../../utils/CommingSoon'
+import CommingSoon from '../utils/CommingSoon'
 
-const Messages = () => {
+const Profile = () => {
   return (
     <div className='w-full h-full'>
       <CommingSoon/>
@@ -9,4 +9,4 @@ const Messages = () => {
   )
 }
 
-export default Messages
+export default Profile
