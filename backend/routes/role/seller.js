@@ -11,7 +11,21 @@ const product = express.Router();
 
 // product.use('/chat',serverChat);
 
+//give all of the product by seller id
 
+product.get('/products', async (req, res) => {
+   try {
+       const products = await productModel.find({}).sort({ createdAt: -1 });
+
+       if (!products) {
+           return res.status(404).json({ message: "user has no published product" });
+       }
+
+       res.status(200).json({ products });
+   } catch (e) {
+       res.status(500).json({ message: "Server error", error: e.message });
+   }
+})
 
 {/*<form action="/stats" enctype="multipart/form-data" method="post">
   <div class="form-group">
@@ -21,7 +35,7 @@ const product = express.Router();
   </div>
 </form>*/}
 
-product.post('/', upload.array('product_image', 2), async (req, res) => {
+product.post('/product', upload.array('product_image', 2), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: "Upload product image" });
@@ -161,29 +175,5 @@ product.get('/:id', async (req, res) => {
         res.status(500).json({ message: "Server error", error: e.message });
     }
 })
-
-//give all of the product by seller id
-
-//product.get('/', async (req, res) => {
-//    try {
-//        const findByStatus = req.query.status;
-
-//        let filter = {};
-
-//        if (findByStatus !== undefined) {
-//            filter.status = findByStatus;
-//        }
-
-//        const allProducts = await productModel.find(filter).sort({ createdAt: -1 });
-
-//        if (!allProducts) {
-//            return res.status(404).json({ message: "user has no published product" });
-//        }
-
-//        res.status(200).json({ allProducts });
-//    } catch (e) {
-//        res.status(500).json({ message: "Server error", error: e.message });
-//    }
-//})
 
 export default product;

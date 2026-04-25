@@ -13,7 +13,7 @@ const productSchema = new Schema({
         type: String,
         required: true,
         enum: {
-            values: ["electronics", "fashion", "books", "home"],
+            values: ["electronics", "fashion", "books", "homedecor"],
             message: "Category must be one of electronics, fashion, books, home"
         }
     },
