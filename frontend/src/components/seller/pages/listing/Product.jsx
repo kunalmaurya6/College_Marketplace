@@ -23,7 +23,7 @@ const Product = (propes) => {
     loadProducts();
   }, [propes.order]);
 
-  console.log(products);
+  // console.log(products);
 
   if(!products || products.length === 0) {
     return(
