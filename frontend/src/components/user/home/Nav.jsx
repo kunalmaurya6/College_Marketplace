@@ -4,7 +4,7 @@ import logo from '../../../assets/logo.png'
 
 const Nav = () => {
   return (
-    <header className='sticky top-0 z-30 w-full border-b border-gray-100 bg-white/95 backdrop-blur'>
+    <header className='sticky top-0 z-30 w-full bg-white/95 backdrop-blur'>
       <div className='mx-auto flex max-w-[1500px] flex-col gap-3 px-4 py-3 sm:px-6 md:h-[92px] md:flex-row md:items-center md:justify-between md:gap-6 lg:px-8 xl:px-10'>
         <NavLink to="." end className='flex shrink-0 items-center'>
           <img src={logo} alt="Logo" className='h-14 w-auto object-contain transition hover:scale-105 sm:h-16 md:h-20' />
