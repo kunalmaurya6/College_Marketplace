@@ -1,7 +1,4 @@
-import logo from './assets/logo.png'
-import Seller from './components/seller/Seller'
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
-import Chat from './components/chat/Chat'
+import { BrowserRouter } from 'react-router-dom'
 import AppRoutes from './components/routes/AppRoutes'
 import { ToastContainer } from 'react-toastify';
 function App() {

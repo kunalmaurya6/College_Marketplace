@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { fetchData } from "../../../api/server";
 
 const categories = ["electronics", "fashion", "books", "homedecor"];
 
@@ -57,11 +57,12 @@ const AddProduct = () => {
         data.append("product_image", img);
       });
 
-      await axios.post("/api/sell/product", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await fetchData("/sell/product", {
+        method: "POST",
+        body: data,
       });
 
-      toast.success("Product uploaded 🚀");
+      toast.success("Product uploaded");
 
       setTimeout(() => {
         navigate("/seller");
@@ -69,7 +70,7 @@ const AddProduct = () => {
 
     } catch (err) {
       console.error(err);
-      toast.error("Upload failed ❌");
+      toast.error(err.message || "Upload failed");
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { fetchData } from "../../../../api/server";
 
 const statusStyles = {
   pending: "bg-yellow-100 text-yellow-700",
@@ -8,17 +8,19 @@ const statusStyles = {
 };
 
 const Product = (propes) => {
-  const [products, setProducts] = useState("");
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = axios.get("/api/sell/products")
-      .then((response) => {
-        setProducts(response.data);
-        console.log(response.data);
-      })
-      .catch((error) => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchData("/sell/products");
+        setProducts(data.products || []);
+      } catch (error) {
         console.error("Error fetching products:", error);
-      });
+      }
+    };
+
+    loadProducts();
   }, [propes.order]);
 
   console.log(products);
@@ -45,7 +47,7 @@ const Product = (propes) => {
         </thead>
 
         <tbody className=" w-full h-full">
-          {products.products.map((item) => (
+          {products.map((item) => (
             <tr key={item._id} className="border-t border-gray-200 shadow-sm hover:bg-gray-50">
               {/* Product */}
               <td className="flex items-center gap-3 p-4">
