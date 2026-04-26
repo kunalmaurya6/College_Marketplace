@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Card from "./Card";
+import { fetchData } from "../../../../api/server";
 
-const statusStyles = {
-  Pending: "bg-yellow-100 text-yellow-700",
-  Approved: "bg-green-100 text-green-700",
-  Sold: "bg-gray-200 text-gray-600",
-};
-
-const Product = (propes) => {
+const Product = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = axios.get("/api/products")
-      .then((response) => {
-        setProducts(response.data.products);
-      })
-      .catch((error) => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchData("/products");
+        setProducts(data.products || []);
+      } catch (error) {
         console.error("Error fetching products:", error);
-      });
+      }
+    };
+
+    loadProducts();
   }, []);
 
   console.log(products);

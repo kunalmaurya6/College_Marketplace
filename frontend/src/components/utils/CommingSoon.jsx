@@ -2,7 +2,7 @@ import React from 'react'
 
 const CommingSoon = () => {
   return (
-    <div className="flex min-h-[60vh] w-full items-center justify-center bg-white px-6 py-12">
+    <div className="flex h-full w-full items-center justify-center bg-white px-6 py-12">
       
       <div className="max-w-lg w-full text-center space-y-8">
         
