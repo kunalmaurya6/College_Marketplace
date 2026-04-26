@@ -1,4 +1,5 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 const Card = ({ product }) => {
   const imageUrl = product?.image?.[0]?.image_url;
@@ -38,9 +39,9 @@ const Card = ({ product }) => {
             <p className="text-xl font-bold text-gray-900">&#8377;{price}</p>
           </div>
 
-          <button className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+          <NavLink to={`/product?id=${product._id}`} className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
             View
-          </button>
+          </NavLink>
         </div>
       </div>
     </article>
