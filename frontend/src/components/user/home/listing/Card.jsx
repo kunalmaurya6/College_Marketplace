@@ -18,10 +18,10 @@ const Card = ({ product }) => {
             <i className="fa-regular fa-image"></i>
           </div>
         )}
-
+{/* 
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-blue-600 shadow-sm">
           Available
-        </span>
+        </span> */}
       </div>
 
       <div className="flex min-h-[130px] flex-col justify-between p-4">
