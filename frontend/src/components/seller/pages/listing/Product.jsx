@@ -4,7 +4,7 @@ import { fetchData } from "../../../../api/server";
 const statusStyles = {
   pending: "bg-yellow-100 text-yellow-700",
   approved: "bg-green-100 text-green-700",
-  sold: "bg-gray-200 text-gray-600",
+  rejected: "bg-gray-200 text-gray-600",
 };
 
 const Product = (propes) => {
