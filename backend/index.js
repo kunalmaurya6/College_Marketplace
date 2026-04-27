@@ -5,6 +5,7 @@ import routes from './routes/route.js'
 import httpServer from 'http'
 import chatServer from './routes/chat/serverChat.js'
 import cors from 'cors'
+import dbConnection from './utils/DB/connect.js'
 
 const app = express()
 
@@ -14,16 +15,18 @@ chatServer(server);
 
 const PORT = process.env.PORT
 
-connectDB();
+
 chatServer(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: "*",
+    origin: "http://localhost:5173",
     credentials: true
 }));
+
+app.use(dbConnection);
 
 app.use('/api',routes);
 
@@ -43,6 +46,6 @@ app.use((err, req, res, next) => {
 
 export default app;
 
-// server.listen(PORT, async () => {
-//     console.log("Server running on: ", PORT);
-// })
+server.listen(PORT, async () => {
+    console.log("Server running on: ", PORT);
+})
