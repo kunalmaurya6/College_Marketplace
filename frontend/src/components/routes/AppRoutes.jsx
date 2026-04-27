@@ -1,13 +1,14 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Seller from '../seller/Seller'
-import { AddProduct, Listings, Messages,Profile,ProductView } from '../seller/pages/pages'
+import { AddProduct, Listings, Messages,Profile,ProductView, Admin } from '../seller/pages/pages'
 import User from '../user/User'
 import Home from '../user/home/Home'
 
 const AppRoutes = () => {
     return (
         <Routes>
+            <Route path="/admin" element={<Admin/>}></Route>
             <Route path="/product" element={<ProductView />} />
             <Route path='/' element={<User />} >
                 <Route index element={<Home/>}/>
