@@ -9,6 +9,7 @@ const statusStyles = {
 
 const Product = (propes) => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -21,11 +22,19 @@ const Product = (propes) => {
     };
 
     loadProducts();
-  }, [propes.order]);
+  }, []);
+
+  useEffect(() => {
+    if (propes.order === "all") {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(products.filter(product => product.status === propes.order));
+    }
+  }, [products, propes.order]);
 
   // console.log(products);
 
-  if(!products || products.length === 0) {
+  if(!filteredProducts || filteredProducts.length === 0) {
     return(
       <div className="w-full h-full flex items-center justify-center">
         <p className="text-gray-500 text-lg">No products found.</p>
@@ -47,7 +56,7 @@ const Product = (propes) => {
         </thead>
 
         <tbody className=" w-full h-full">
-          {products.map((item) => (
+          {filteredProducts.map((item) => (
             <tr key={item._id} className="border-t border-gray-200 shadow-sm hover:bg-gray-50">
               {/* Product */}
               <td className="flex items-center gap-3 p-4">
