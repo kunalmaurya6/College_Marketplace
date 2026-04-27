@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchData } from "../../api/server";
+import { isFavoriteProduct, listenForFavoriteChanges, toggleFavoriteProduct } from "../../utils/favorites";
 
 const ProductView = () => {
   const [searchParams] = useSearchParams();
@@ -12,6 +13,7 @@ const ProductView = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -35,6 +37,15 @@ const ProductView = () => {
     };
 
     loadProduct();
+  }, [productId]);
+
+  useEffect(() => {
+    const updateFavoriteState = () => {
+      setIsFavorite(isFavoriteProduct(productId));
+    };
+
+    updateFavoriteState();
+    return listenForFavoriteChanges(updateFavoriteState);
   }, [productId]);
 
   const images = useMemo(() => {
@@ -62,6 +73,9 @@ const ProductView = () => {
     product?.seller?.userName ||
     product?.seller?.email?.split("@")?.[0] ||
     "Campus Seller";
+  const handleFavorite = () => {
+    setIsFavorite(toggleFavoriteProduct(product));
+  };
 
   if (loading) {
     return (
@@ -119,10 +133,13 @@ const ProductView = () => {
 
             <button
               type="button"
-              aria-label="Save listing"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-lg text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+              onClick={handleFavorite}
+              aria-label={isFavorite ? "Remove from favorites" : "Save listing"}
+              className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white text-lg transition hover:border-red-200 hover:bg-red-50 ${
+                isFavorite ? "border-red-200 text-red-500" : "border-gray-200 text-gray-700 hover:text-red-500"
+              }`}
             >
-              <i className="fa-regular fa-heart"></i>
+              <i className={`${isFavorite ? "fa-solid" : "fa-regular"} fa-heart`}></i>
             </button>
 
             <NavLink
