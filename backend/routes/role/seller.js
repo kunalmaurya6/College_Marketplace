@@ -15,7 +15,13 @@ const product = express.Router();
 
 product.get('/products', async (req, res) => {
    try {
-       const products = await productModel.find({}).sort({ createdAt: -1 });
+       const filter = {};
+
+       if (req.query.saleStatus) {
+           filter.saleStatus = req.query.saleStatus;
+       }
+
+       const products = await productModel.find(filter).sort({ createdAt: -1 });
 
        if (!products) {
            return res.status(404).json({ message: "user has no published product" });
@@ -67,6 +73,7 @@ product.post('/product', upload.array('product_image', 2), async (req, res) => {
 
         value.image = images;
         value.status = "pending";
+        value.saleStatus = "available";
         const response = await productModel(value);
 
         await response.save();
@@ -106,6 +113,36 @@ product.delete('/:id', async (req, res) => {
             message: "Server error",
             error: e.message,
         });
+    }
+});
+
+product.patch('/:id/sale-status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { saleStatus } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid product ID" });
+        }
+
+        if (!["available", "sold"].includes(saleStatus)) {
+            return res.status(400).json({ message: "saleStatus must be available or sold" });
+        }
+
+        const product = await productModel.findById(id);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        product.saleStatus = saleStatus;
+        await product.save();
+
+        res.status(200).json({
+            message: `Product marked as ${saleStatus}`,
+            product
+        });
+    } catch (e) {
+        res.status(500).json({ message: "Server error", error: e.message });
     }
 });
 
