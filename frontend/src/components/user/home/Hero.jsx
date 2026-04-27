@@ -3,6 +3,13 @@ import HeroImage from '../../../assets/hero_image.jpeg'
 import { NavLink } from 'react-router-dom'
 
 const Hero = () => {
+  const showProducts = () => {
+    document.getElementById('products')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+
   return (
     <section className='w-full bg-sky-50'>
       <div
@@ -31,9 +38,9 @@ const Hero = () => {
             </p>
 
             <div className='mt-4 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-5'>
-              <NavLink to='products' className='inline-flex justify-center rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700 sm:px-7'>
+              <button type='button' onClick={showProducts} className='inline-flex justify-center rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-blue-700 sm:px-7'>
                 Browse Items
-              </NavLink>
+              </button>
               <NavLink to='/seller/product' className='inline-flex justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 sm:px-7'>
                 Start Selling
               </NavLink>
