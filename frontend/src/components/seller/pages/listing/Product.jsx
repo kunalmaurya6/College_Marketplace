@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { fetchData } from "../../../../api/server";
 
 const statusStyles = {
@@ -83,7 +84,6 @@ const Product = (propes) => {
             <th className="p-4">Status</th>
             <th className="p-4">Sale</th>
             <th className="p-4">Actions</th>
-            <th className="p-4">Remove</th>
           </tr>
         </thead>
 
@@ -126,25 +126,26 @@ const Product = (propes) => {
 
               {/* Actions */}
               <td className="p-4">
-                <button
-                  type="button"
-                  onClick={() => handleSaleStatus(item)}
-                  disabled={updatingProductId === item._id}
-                  className="rounded-md border px-3 py-1 text-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {updatingProductId === item._id
-                    ? "Updating..."
-                    : item.saleStatus === "sold"
-                      ? "Mark Available"
-                      : "Mark Sold"}
-                </button>
-              </td>
-
-              {/* delete */}
-              <td className="p-4">
-                <button className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100">
-                  Delete
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSaleStatus(item)}
+                    disabled={updatingProductId === item._id}
+                    className="rounded-md border px-3 py-1 text-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {updatingProductId === item._id
+                      ? "Updating..."
+                      : item.saleStatus === "sold"
+                        ? "Mark Available"
+                        : "Mark Sold"}
+                  </button>
+                  <NavLink
+                    to={`/seller/product?id=${item._id}`}
+                    className="rounded-md border border-blue-200 px-3 py-1 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                  >
+                    Edit
+                  </NavLink>
+                </div>
               </td>
             </tr>
           ))}
