@@ -7,9 +7,15 @@ const statusStyles = {
   rejected: "bg-red-200 text-black-500",
 };
 
+const saleStatusStyles = {
+  available: "bg-blue-100 text-blue-700",
+  sold: "bg-gray-200 text-gray-700",
+};
+
 const Product = (propes) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [updatingProductId, setUpdatingProductId] = useState("");
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -34,6 +40,31 @@ const Product = (propes) => {
 
   // console.log(products);
 
+  const handleSaleStatus = async (product) => {
+    const nextSaleStatus = product.saleStatus === "sold" ? "available" : "sold";
+    setUpdatingProductId(product._id);
+
+    try {
+      const data = await fetchData(`/sell/${product._id}/sale-status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ saleStatus: nextSaleStatus }),
+      });
+
+      setProducts((currentProducts) =>
+        currentProducts.map((item) =>
+          item._id === product._id ? data.product : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating sale status:", error);
+    } finally {
+      setUpdatingProductId("");
+    }
+  };
+
   if(!filteredProducts || filteredProducts.length === 0) {
     return(
       <div className="w-full h-full flex items-center justify-center">
@@ -44,12 +75,13 @@ const Product = (propes) => {
 
   return (
     <div className="h-full w-full overflow-x-auto rounded-lg bg-white shadow-sm">
-      <table className="min-w-[760px] w-full border-collapse">
+      <table className="min-w-[900px] w-full border-collapse">
         <thead className="sticky top-0 rounded-lg bg-gray-100 text-left text-sm text-gray-500">
           <tr>
             <th className="p-4">Product</th>
             <th className="p-4">Price</th>
             <th className="p-4">Status</th>
+            <th className="p-4">Sale</th>
             <th className="p-4">Actions</th>
             <th className="p-4">Remove</th>
           </tr>
@@ -83,10 +115,28 @@ const Product = (propes) => {
                 </span>
               </td>
 
+              {/* Sale Status */}
+              <td className="p-4">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${saleStatusStyles[item.saleStatus || "available"]}`}
+                >
+                  {item.saleStatus || "available"}
+                </span>
+              </td>
+
               {/* Actions */}
               <td className="p-4">
-                <button className="rounded-md border px-3 py-1 text-sm hover:bg-gray-100">
-                  Sold/Available
+                <button
+                  type="button"
+                  onClick={() => handleSaleStatus(item)}
+                  disabled={updatingProductId === item._id}
+                  className="rounded-md border px-3 py-1 text-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {updatingProductId === item._id
+                    ? "Updating..."
+                    : item.saleStatus === "sold"
+                      ? "Mark Available"
+                      : "Mark Sold"}
                 </button>
               </td>
 
