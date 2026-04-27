@@ -24,7 +24,11 @@ const validateProduct = Joi.object({
 
   status: Joi.string()
     .valid("pending", "approved", "rejected")
-    .default("pending")
+    .default("pending"),
+
+  saleStatus: Joi.string()
+    .valid("available", "sold")
+    .default("available")
 });
 
 export default validateProduct;

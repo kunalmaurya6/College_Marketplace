@@ -11,6 +11,16 @@ user.get('/products', async (req, res) => {
         const cursor = req.query.cursor;
 
         let query = { status: "approved" };
+        const saleStatus = req.query.saleStatus || "available";
+
+        if (saleStatus === "available") {
+            query.$or = [
+                { saleStatus: "available" },
+                { saleStatus: { $exists: false } }
+            ];
+        } else if (saleStatus !== "all") {
+            query.saleStatus = saleStatus;
+        }
 
         if (cursor) {
             query._id = { $lt: cursor };
