@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
 import logo from '../../../assets/logo.png'
 import { getFavoriteProducts, listenForFavoriteChanges } from '../../../utils/favorites'
+import { getCartProducts, listenForCartChanges } from '../../../utils/cart'
 
 const Nav = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [searchText, setSearchText] = useState(searchParams.get('search') || '')
   const [favoriteCount, setFavoriteCount] = useState(0)
+  const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
     setSearchText(searchParams.get('search') || '')
@@ -20,6 +22,20 @@ const Nav = () => {
 
     updateFavoriteCount()
     return listenForFavoriteChanges(updateFavoriteCount)
+  }, [])
+
+  useEffect(() => {
+    const updateCartCount = async () => {
+      try {
+        const data = await getCartProducts()
+        setCartCount(data.count || 0)
+      } catch {
+        setCartCount(0)
+      }
+    }
+
+    updateCartCount()
+    return listenForCartChanges(updateCartCount)
   }, [])
 
   const scrollToProducts = () => {
@@ -75,6 +91,15 @@ const Nav = () => {
             {favoriteCount > 0 && (
               <span className='absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-200 px-1 text-[11px] font-bold leading-none text-white'>
                 {favoriteCount}
+              </span>
+            )}
+          </NavLink>
+
+          <NavLink to="cart" aria-label='Cart' className='relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-lg text-gray-700 transition hover:scale-105 hover:bg-blue-50 hover:text-blue-600 sm:h-[50px] sm:w-[50px]'>
+            <i className="fa-solid fa-cart-shopping"></i>
+            {cartCount > 0 && (
+              <span className='absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[11px] font-bold leading-none text-white'>
+                {cartCount}
               </span>
             )}
           </NavLink>
