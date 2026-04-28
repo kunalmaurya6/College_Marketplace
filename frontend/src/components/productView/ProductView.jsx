@@ -17,6 +17,7 @@ const ProductView = () => {
   const [error, setError] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -85,6 +86,7 @@ const ProductView = () => {
       setAddingToCart(true);
       await addProductToCart(productId);
       toast.success("Added to cart");
+      setIsInCart(true);
     } catch (error) {
       toast.error(error.message || "Unable to add to cart");
     } finally {
@@ -298,12 +300,12 @@ const ProductView = () => {
             {!isSellerView && (
               <button
                 type="button"
-                onClick={handleAddToCart}
+                onClick={isInCart ? () => navigate("/cart") : handleAddToCart}
                 disabled={addingToCart}
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 text-base font-bold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <i className="fa-solid fa-cart-shopping"></i>
-                {addingToCart ? "Adding..." : "Add to Cart"}
+                {addingToCart ? "Adding..." : isInCart ? "See Cart" : "Add to Cart"}
               </button>
             )}
           </div>
