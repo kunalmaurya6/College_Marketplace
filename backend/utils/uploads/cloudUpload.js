@@ -14,7 +14,7 @@ export const uploadToCloudinary = (fileBuffer) => {
             width: 800,
             height: 800,
             crop: "pad",
-            background: "white"
+            background: "transparent"
           }
         ]
       },

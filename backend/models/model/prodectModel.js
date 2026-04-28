@@ -52,6 +52,11 @@ const productSchema = new Schema({
         enum: ["pending", "approved", "rejected"],
         default: "pending"
     },
+    saleStatus: {
+        type: String,
+        enum: ["available", "sold"],
+        default: "available"
+    },
     seller: {
         type:Schema.Types.ObjectId,
         ref: 'roleModel'
