@@ -4,6 +4,8 @@ import Seller from '../seller/Seller'
 import { AddProduct, Listings, Messages,Profile,ProductView, Admin } from '../seller/pages/pages'
 import User from '../user/User'
 import Home from '../user/home/Home'
+import Favorites from '../user/home/Favorites'
+import Cart from '../user/home/Cart'
 import NotFound from '../utils/NotFound'
 
 const AppRoutes = () => {
@@ -17,6 +19,8 @@ const AppRoutes = () => {
 
             <Route path='/' element={<User />} >
                 <Route index element={<Home/>}/>
+                <Route path='favorites' element={<Favorites />} />
+                <Route path='cart' element={<Cart />} />
                 <Route path='profile' element={<Profile />} />
             </Route>
 

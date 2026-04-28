@@ -1,17 +1,22 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { fetchData } from "../../api/server";
+import { isFavoriteProduct, listenForFavoriteChanges, toggleFavoriteProduct } from "../../utils/favorites";
+import { addProductToCart } from "../../utils/cart";
 
 const ProductView = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const productId = searchParams.get("id");
-  const seller = searchParams.get("by");
-  const isSellerView = seller === "seller";
+  const location = useLocation();
+  const productId = location.state?.productId || searchParams.get("id");
+  const isSellerView = Boolean(location.state?.isSeller);
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -35,6 +40,15 @@ const ProductView = () => {
     };
 
     loadProduct();
+  }, [productId]);
+
+  useEffect(() => {
+    const updateFavoriteState = () => {
+      setIsFavorite(isFavoriteProduct(productId));
+    };
+
+    updateFavoriteState();
+    return listenForFavoriteChanges(updateFavoriteState);
   }, [productId]);
 
   const images = useMemo(() => {
@@ -62,6 +76,21 @@ const ProductView = () => {
     product?.seller?.userName ||
     product?.seller?.email?.split("@")?.[0] ||
     "Campus Seller";
+  const handleFavorite = () => {
+    setIsFavorite(toggleFavoriteProduct(product));
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      setAddingToCart(true);
+      await addProductToCart(productId);
+      toast.success("Added to cart");
+    } catch (error) {
+      toast.error(error.message || "Unable to add to cart");
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -109,21 +138,47 @@ const ProductView = () => {
           </button>
 
           <div className="flex items-center gap-3">
-            <NavLink
-              to="/seller/product"
-              className="hidden items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:inline-flex"
-            >
-              <i className="fa-solid fa-chart-line"></i>
-              Selling
-            </NavLink>
+            {isSellerView ? (
+              <NavLink
+                to="/seller/product"
+                state={{ productId, isSeller: true }}
+                className="inline-flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
+              >
+                <i className="fa-regular fa-pen-to-square"></i>
+                Edit
+              </NavLink>
+            ) : (
+              <NavLink
+                to="/seller/product"
+                className="hidden items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 sm:inline-flex"
+              >
+                <i className="fa-solid fa-chart-line"></i>
+                Selling
+              </NavLink>
+            )}
 
-            <button
-              type="button"
-              aria-label="Save listing"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-lg text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
-            >
-              <i className="fa-regular fa-heart"></i>
-            </button>
+            {!isSellerView && (
+              <button
+                type="button"
+                onClick={handleFavorite}
+                aria-label={isFavorite ? "Remove from favorites" : "Save listing"}
+                className={`flex h-11 w-11 items-center justify-center rounded-full border bg-white text-lg transition hover:border-red-200 hover:bg-red-50 ${
+                  isFavorite ? "border-red-200 text-red-500" : "border-gray-200 text-gray-700 hover:text-red-500"
+                }`}
+              >
+                <i className={`${isFavorite ? "fa-solid" : "fa-regular"} fa-heart`}></i>
+              </button>
+            )}
+
+            {!isSellerView && (
+              <NavLink
+                to="/cart"
+                aria-label="Cart"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition hover:scale-105 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i className="fa-solid fa-cart-shopping"></i>
+              </NavLink>
+            )}
 
             <NavLink
               to="/profile"
@@ -232,7 +287,7 @@ const ProductView = () => {
             </div>
           </div>
 
-          <div className={`mt-7 grid gap-4 ${isSellerView ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          <div className={`mt-7 grid gap-4 ${isSellerView ? "" : "sm:grid-cols-2"}`}>
             <button
               type="button"
               className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-blue-600 px-5 text-base font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
@@ -240,21 +295,16 @@ const ProductView = () => {
               <i className="fa-regular fa-message"></i>
               Message Seller
             </button>
-            <button
-              type="button"
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 text-base font-bold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700"
-            >
-              <i className="fa-solid fa-cart-shopping"></i>
-              Buy Now
-            </button>
-            {isSellerView && (
-              <NavLink
-                to={`/seller/product?id=${productId}`}
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-gray-900 px-5 text-base font-bold text-white shadow-lg shadow-gray-200 transition hover:bg-gray-800"
+            {!isSellerView && (
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={addingToCart}
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 text-base font-bold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <i className="fa-regular fa-pen-to-square"></i>
-                Edit
-              </NavLink>
+                <i className="fa-solid fa-cart-shopping"></i>
+                {addingToCart ? "Adding..." : "Add to Cart"}
+              </button>
             )}
           </div>
 
