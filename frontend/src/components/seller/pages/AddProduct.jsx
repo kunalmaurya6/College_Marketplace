@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchData } from "../../../api/server";
 
@@ -7,8 +7,9 @@ const categories = ["electronics", "fashion", "books", "homedecor"];
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const productId = searchParams.get("id");
+  const productId = location.state?.productId || searchParams.get("id");
   const isEditMode = Boolean(productId);
 
   const [formData, setFormData] = useState({
