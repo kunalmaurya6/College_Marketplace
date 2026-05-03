@@ -1,14 +1,14 @@
 import Joi from "joi";
 
 // Joi validation schema
-const roleValidationSchema = Joi.object({
-  // userName: Joi.string()
-  //   .max(20)
-  //   .required()
-  //   .messages({
-  //     "string.max": "Name cannot exceed 20 characters",
-  //     "any.required": "Name is required",
-  //   }),
+const userValidationSchema = Joi.object({
+  username: Joi.string()
+    .max(20)
+    .required()
+    .messages({
+      "string.max": "Name cannot exceed 20 characters",
+      "any.required": "Name is required",
+    }),
 
   email: Joi.string()
     .email()
@@ -29,13 +29,13 @@ const roleValidationSchema = Joi.object({
       "any.required": "Password is required",
     }),
 
-  role: Joi.string()
-    .valid("seller", "user", "admin")
-    .required()
-    .messages({
-      "any.only": "Role must be one of seller, user, admin",
-      "any.required": "Role is required",
-    }),
+  // user: Joi.string()
+  //   .valid("seller", "user", "admin")
+  //   .required()
+  //   .messages({
+  //     "any.only": "user must be one of seller, user, admin",
+  //     "any.required": "user is required",
+  //   }),
 
   // image: Joi.array()
   //   .items(
@@ -57,4 +57,4 @@ const roleValidationSchema = Joi.object({
   //   }),
 });
 
-export default roleValidationSchema
+export default userValidationSchema

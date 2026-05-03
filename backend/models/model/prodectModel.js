@@ -59,7 +59,7 @@ const productSchema = new Schema({
     },
     seller: {
         type:Schema.Types.ObjectId,
-        ref: 'roleModel'
+        ref: 'user'
     }
 }, { timestamps: true });
 

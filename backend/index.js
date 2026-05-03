@@ -6,6 +6,7 @@ import httpServer from 'http'
 import chatServer from './routes/chat/serverChat.js'
 import cors from 'cors'
 import dbConnection from './utils/DB/connect.js'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 
@@ -26,6 +27,8 @@ app.use(cors({
     credentials: true
 }));
 
+app.use(cookieParser());
+
 app.use(dbConnection);
 
 app.use('/api',routes);
@@ -44,7 +47,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-export default app;
+// export default app;
 
 server.listen(PORT, async () => {
     console.log("Server running on: ", PORT);
