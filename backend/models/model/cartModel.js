@@ -2,9 +2,14 @@ import { Schema, model } from "mongoose";
 
 const cartSchema = new Schema(
     {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: "user",
+            required: true,
+            index: true,
+        },
         sessionId: {
             type: String,
-            required: true,
             index: true,
         },
         product: {
@@ -17,6 +22,7 @@ const cartSchema = new Schema(
 );
 
 cartSchema.index({ sessionId: 1, product: 1 }, { unique: true });
+cartSchema.index({ user: 1, product: 1 }, { unique: true });
 
 const cartModel = model("cart", cartSchema);
 

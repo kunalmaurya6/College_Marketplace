@@ -74,7 +74,7 @@ const ProductView = () => {
       })
     : "Recently listed";
   const sellerName =
-    product?.seller?.userName ||
+    product?.seller?.username ||
     product?.seller?.email?.split("@")?.[0] ||
     "Campus Seller";
   const handleFavorite = () => {

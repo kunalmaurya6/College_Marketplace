@@ -7,31 +7,41 @@ import Home from '../user/home/Home'
 import Favorites from '../user/home/Favorites'
 import Cart from '../user/home/Cart'
 import NotFound from '../utils/NotFound'
+import AuthPage from '../auth/AuthPage'
+import ProtectedRoute from '../auth/ProtectedRoute'
+import AdminRoute from '../auth/AdminRoute'
 
 const AppRoutes = () => {
 
     return (
         <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/signup" element={<AuthPage />} />
 
-            <Route path="/admin" element={<Admin/>}/>
+            <Route element={<ProtectedRoute />}>
+                <Route element={<AdminRoute />}>
+                    <Route path="/admin" element={<Admin/>}/>
+                </Route>
 
-            <Route path="/product" element={<ProductView />} />
+                <Route path="/product" element={<ProductView />} />
 
-            <Route path='/' element={<User />} >
-                <Route index element={<Home/>}/>
-                <Route path='favorites' element={<Favorites />} />
-                <Route path='cart' element={<Cart />} />
-                <Route path='profile' element={<Profile />} />
-            </Route>
+                <Route path='/' element={<User />} >
+                    <Route index element={<Home/>}/>
+                    <Route path='favorites' element={<Favorites />} />
+                    <Route path='cart' element={<Cart />} />
+                    <Route path='profile' element={<Profile />} />
+                </Route>
 
-            {/* <Route path="/chat" element={<Chat />} /> */}
+                {/* <Route path="/chat" element={<Chat />} /> */}
 
-            <Route path="/seller" element={<Seller />} >
-                <Route index element={<Listings />} />
-                <Route path="product" element={<AddProduct />} />
-                <Route path="messages" element={<Messages />} />
-                <Route path="profile" element={<Profile />} />
-                {/* <Route path="logout" element={<Logout />} /> */}
+                <Route path="/seller" element={<Seller />} >
+                    <Route index element={<Listings />} />
+                    <Route path="product" element={<AddProduct />} />
+                    <Route path="messages" element={<Messages />} />
+                    <Route path="profile" element={<Profile />} />
+                    {/* <Route path="logout" element={<Logout />} /> */}
+                </Route>
             </Route>
 
             <Route path="*" element={<NotFound />} />

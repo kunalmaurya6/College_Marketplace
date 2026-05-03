@@ -4,35 +4,51 @@ import bcrypt from "bcrypt";
 import userValidationSchema from "../../models/validation/userValidation.js";
 import express from 'express';
 import jwt from 'jsonwebtoken'
+import requireAuth, { isAdminUser } from "./authMiddleware.js";
 
 const authRoute = express.Router();
 
+const buildAuthResponse = (user, token) => ({
+    token,
+    user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: isAdminUser(user) ? "admin" : "user",
+    },
+});
+
 authRoute.post('/signup', async (req, res) => {
     try {
+        console.log(req.body);
         const { error, value } = userValidationSchema.validate(req.body);
         if (error) {
             return res.status(400).json({
                 error: error.details.map(err => err.message)
             });
         }
-        const { email, password, username } = value;
-        const existingUser = await User.findOne({ email });
+        const { password } = value;
+        const email = value.email.trim().toLowerCase();
+        const username = value.username.trim();
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            return res.json({ message: "User already exists" });
+            return res.status(409).json({ message: "Email or username already exists" });
         }
         const hashPassword = await bcrypt.hash(password, 10);
         const user = await User.create({ email, password: hashPassword, username });
         const token = secretToken(user._id);
         res.cookie("token", token, {
             withCredentials: true,
-            httpOnly: false,
+            httpOnly: true,
+            sameSite: "lax",
         });
         res
             .status(201)
-            .json({ message: "User signed in successfully", success: true, user });
+            .json({ message: "User signed up successfully", success: true, ...buildAuthResponse(user, token) });
 
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: error.message || "Signup failed" });
     }
 }
 );
@@ -42,28 +58,30 @@ authRoute.post('/login', async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.json({ message: 'All fields are required' })
+            return res.status(400).json({ message: 'All fields are required' })
         }
         const user = await User.findOne({ email }).select('+password');
         if (!user) {
-            return res.json({ message: 'Incorrect password or email' })
+            return res.status(401).json({ message: 'Incorrect password or email' })
         }
 
         const auth = await bcrypt.compare(password, user.password)
         if (!auth) {
-            return res.json({ message: 'Incorrect password or email' })
+            return res.status(401).json({ message: 'Incorrect password or email' })
         }
         const token = secretToken(user._id);
         res.cookie("token", token, {
             withCredentials: true,
-            httpOnly: false,
+            httpOnly: true,
+            sameSite: "lax",
         });
         res
             .status(200)
-            .json({ message: "User logged in successfully", success: true });
+            .json({ message: "User logged in successfully", success: true, ...buildAuthResponse(user, token) });
 
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: error.message || "Login failed" });
     }
 }
 );
@@ -84,5 +102,22 @@ authRoute.post('/', (req, res) => {
     })
 }
 );
+
+authRoute.get('/me', requireAuth, (req, res) => {
+    res.status(200).json({
+        success: true,
+        user: {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email,
+            role: req.isAdmin ? "admin" : "user",
+        },
+    });
+});
+
+authRoute.post('/logout', (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+});
 
 export default authRoute

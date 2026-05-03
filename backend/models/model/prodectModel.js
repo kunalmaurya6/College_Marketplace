@@ -1,6 +1,4 @@
-import mongoose from "mongoose";
-import { Schema,model } from "mongoose";
-// import 
+import mongoose,{ Schema, model } from "mongoose";
 
 const productSchema = new Schema({
     title: {
@@ -13,7 +11,7 @@ const productSchema = new Schema({
         type: String,
         required: true,
         enum: {
-            values: ["electronics", "fashion", "books", "homedecor"],
+            values: ["electronics", "fashion", "books", "homedecor", "other"],
             message: "Category must be one of electronics, fashion, books, home"
         }
     },
@@ -58,7 +56,7 @@ const productSchema = new Schema({
         default: "available"
     },
     seller: {
-        type:Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'user'
     }
 }, { timestamps: true });

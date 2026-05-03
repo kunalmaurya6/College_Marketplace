@@ -38,14 +38,11 @@ const userSchema = new Schema(
             select: false, // do not return password by default
         },
 
-        // user: {
-        //     type: String,
-        //     required: true,
-        //     enum: {
-        //         values: ["seller", "user", "admin"],
-        //         message: "user must be one of seller, user, admin",
-        //     }
-        // },
+        role: {
+            type: String,
+            enum: ["user", "admin"],
+            default: "user",
+        }
 
         // image: {
         //     type: [imageSchema],
