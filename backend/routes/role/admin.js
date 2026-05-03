@@ -2,8 +2,10 @@ import express from 'express';
 import productModel from '../../models/model/prodectModel.js';
 import mongoose from 'mongoose';
 import deleteProduct from '../../utils/uploads/delete.js';
+import requireAuth, { requireAdmin } from '../auth/authMiddleware.js';
 
 const admin = express.Router();
+admin.use(requireAuth, requireAdmin);
 
 admin.get('/', async (req, res) => {
     try {

@@ -5,9 +5,11 @@ import upload from '../../utils/uploads/upload.js';
 import { uploadToCloudinary } from '../../utils/uploads/cloudUpload.js';
 import deleteProduct from '../../utils/uploads/delete.js';
 import validateProduct from '../../models/validation/productValidation.js';
+import requireAuth from '../auth/authMiddleware.js';
 // import serverChat from '../chat/serverChat.js'
 
 const product = express.Router();
+product.use(requireAuth);
 
 // product.use('/chat',serverChat);
 
@@ -15,13 +17,13 @@ const product = express.Router();
 
 product.get('/products', async (req, res) => {
    try {
-       const filter = {};
+       const filter = { seller: req.user._id };
 
        if (req.query.saleStatus) {
            filter.saleStatus = req.query.saleStatus;
        }
 
-       const products = await productModel.find(filter).sort({ createdAt: -1 });
+       const products = await productModel.find(filter).populate("seller", "username email").sort({ createdAt: -1 });
 
        if (!products) {
            return res.status(404).json({ message: "user has no published product" });
@@ -74,6 +76,7 @@ product.post('/product', upload.array('product_image', 2), async (req, res) => {
         value.image = images;
         value.status = "pending";
         value.saleStatus = "available";
+        value.seller = req.user._id;
         const response = await productModel(value);
 
         await response.save();
@@ -95,7 +98,7 @@ product.delete('/:id', async (req, res) => {
             return res.status(400).json({ message: "Invalid ID format" });
         }
 
-        const product = await productModel.findById(id);
+        const product = await productModel.findOne({ _id: id, seller: req.user._id });
 
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
@@ -129,7 +132,7 @@ product.patch('/:id/sale-status', async (req, res) => {
             return res.status(400).json({ message: "saleStatus must be available or sold" });
         }
 
-        const product = await productModel.findById(id);
+        const product = await productModel.findOne({ _id: id, seller: req.user._id });
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
@@ -159,7 +162,7 @@ product.patch('/:id', upload.array('product_image', 2), async (req, res) => {
             return res.status(400).json({ message: "Invalid product ID" });
         }
 
-        const product = await productModel.findById(id);
+        const product = await productModel.findOne({ _id: id, seller: req.user._id });
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
@@ -201,7 +204,7 @@ product.get('/:id', async (req, res) => {
             return res.status(400).json({ message: "Invalid ID format" });
         }
 
-        const data = await productModel.findById(id);
+        const data = await productModel.findOne({ _id: id, seller: req.user._id }).populate("seller", "username email");
 
         if (!data) {
             return res.status(404).json({ message: "Product not found" });

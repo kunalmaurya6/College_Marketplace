@@ -27,6 +27,7 @@ user.get('/products', async (req, res) => {
         }
 
         const products = await productModel.find(query)
+            .populate("seller", "username email")
             .sort({ createdAt: -1 })
             .limit(limit);
 
@@ -52,7 +53,7 @@ user.get('/product/:id', async (req, res) => {
             return res.status(400).json({ message: "Invalid ID format" });
         }
 
-        const data = await productModel.findById(id);
+        const data = await productModel.findById(id).populate("seller", "username email");
 
         if (!data) {
             return res.status(404).json({ message: "Product not found" });

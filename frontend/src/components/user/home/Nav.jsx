@@ -3,9 +3,11 @@ import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
 import logo from '../../../assets/logo.png'
 import { getFavoriteProducts, listenForFavoriteChanges } from '../../../utils/favorites'
 import { getCartProducts, listenForCartChanges } from '../../../utils/cart'
+import { useAuth } from '../../../context/useAuth'
 
 const Nav = () => {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [searchParams] = useSearchParams()
   const [searchText, setSearchText] = useState(searchParams.get('search') || '')
   const [favoriteCount, setFavoriteCount] = useState(0)
@@ -65,6 +67,11 @@ const Nav = () => {
     scrollToProducts()
   }
 
+  const handleLogout = async () => {
+    await logout()
+    navigate('/auth', { replace: true })
+  }
+
   return (
     <header className='sticky top-0 z-30 w-full bg-white/95 backdrop-blur'>
       <div className='mx-auto flex max-w-[1500px] flex-col gap-3 px-4 py-3 sm:px-6 md:h-[92px] md:flex-row md:items-center md:justify-between md:gap-6 lg:px-8 xl:px-10'>
@@ -105,8 +112,12 @@ const Nav = () => {
           </NavLink>
 
           <NavLink to="profile" aria-label='Profile' className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-lg text-gray-700 transition hover:scale-105 hover:bg-blue-50 hover:text-blue-600 sm:h-[50px] sm:w-[50px]'>
-            <i className="fa-solid fa-user"></i>
+            {user?.username ? user.username.charAt(0).toUpperCase() : <i className="fa-solid fa-user"></i>}
           </NavLink>
+
+          <button type="button" onClick={handleLogout} aria-label='Logout' className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-lg text-gray-700 transition hover:scale-105 hover:bg-red-50 hover:text-red-600 sm:h-[50px] sm:w-[50px]'>
+            <i className="fa-solid fa-right-from-bracket"></i>
+          </button>
         </div>
       </div>
     </header>

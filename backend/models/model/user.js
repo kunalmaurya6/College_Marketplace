@@ -14,14 +14,14 @@ import mongoose, { Schema, model } from "mongoose";
 //     { _id: false }
 // );
 
-const roleSchema = new Schema(
+const userSchema = new Schema(
     {
-        // userName: {
-        //     type: String,
-        //     required: true,
-        //     maxlength: [20, "Name cannot exceed 20 characters"],
-        //     unique:true
-        // },
+        username: {
+            type: String,
+            required: true,
+            maxlength: [20, "Name cannot exceed 20 characters"],
+            unique:true
+        },
 
         email: {
             type: String,
@@ -40,12 +40,9 @@ const roleSchema = new Schema(
 
         role: {
             type: String,
-            required: true,
-            enum: {
-                values: ["seller", "user", "admin"],
-                message: "Role must be one of seller, user, admin",
-            }
-        },
+            enum: ["user", "admin"],
+            default: "user",
+        }
 
         // image: {
         //     type: [imageSchema],
@@ -59,6 +56,6 @@ const roleSchema = new Schema(
     }
 );
 
-const roleModel = model('role', roleSchema);
+const userModel = model('user', userSchema);
 
-export default roleModel;
+export default userModel;

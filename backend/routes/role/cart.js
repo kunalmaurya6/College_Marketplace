@@ -2,21 +2,15 @@ import express from "express";
 import mongoose from "mongoose";
 import cartModel from "../../models/model/cartModel.js";
 import productModel from "../../models/model/prodectModel.js";
+import requireAuth from "../auth/authMiddleware.js";
 
 const cart = express.Router();
-
-const getSessionId = (req) => req.headers["x-cart-session-id"] || req.body?.sessionId;
+cart.use(requireAuth);
 
 cart.get("/", async (req, res) => {
     try {
-        const sessionId = getSessionId(req);
-
-        if (!sessionId) {
-            return res.status(400).json({ message: "Cart session is required" });
-        }
-
         const items = await cartModel
-            .find({ sessionId })
+            .find({ user: req.user._id })
             .populate("product")
             .sort({ createdAt: -1 });
 
@@ -32,12 +26,7 @@ cart.get("/", async (req, res) => {
 
 cart.post("/", async (req, res) => {
     try {
-        const sessionId = getSessionId(req);
         const { productId } = req.body;
-
-        if (!sessionId) {
-            return res.status(400).json({ message: "Cart session is required" });
-        }
 
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ message: "Invalid product ID" });
@@ -50,12 +39,12 @@ cart.post("/", async (req, res) => {
         }
 
         const item = await cartModel.findOneAndUpdate(
-            { sessionId, product: productId },
-            { sessionId, product: productId },
+            { user: req.user._id, product: productId },
+            { user: req.user._id, sessionId: String(req.user._id), product: productId },
             { new: true, upsert: true, setDefaultsOnInsert: true }
         ).populate("product");
 
-        const count = await cartModel.countDocuments({ sessionId });
+        const count = await cartModel.countDocuments({ user: req.user._id });
 
         res.status(200).json({
             message: "Product added to cart",
@@ -69,20 +58,15 @@ cart.post("/", async (req, res) => {
 
 cart.delete("/:productId", async (req, res) => {
     try {
-        const sessionId = getSessionId(req);
         const { productId } = req.params;
-
-        if (!sessionId) {
-            return res.status(400).json({ message: "Cart session is required" });
-        }
 
         if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ message: "Invalid product ID" });
         }
 
-        await cartModel.findOneAndDelete({ sessionId, product: productId });
+        await cartModel.findOneAndDelete({ user: req.user._id, product: productId });
 
-        const count = await cartModel.countDocuments({ sessionId });
+        const count = await cartModel.countDocuments({ user: req.user._id });
 
         res.status(200).json({
             message: "Product removed from cart",

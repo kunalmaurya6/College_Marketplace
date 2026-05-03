@@ -104,7 +104,6 @@ const AddProduct = () => {
   // submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
       if (!isEditMode && images.length === 0) {
@@ -112,6 +111,7 @@ const AddProduct = () => {
         return;
       }
 
+      setLoading(true);
       const data = new FormData();
 
       Object.keys(formData).forEach((key) => {
@@ -142,7 +142,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="flex min-h-full w-full items-center justify-center bg-gray-50 px-4 py-6 sm:py-10">
+    <div className="flex h-full min-h-0 w-full items-start justify-center overflow-y-auto bg-gray-50 px-4 py-6 sm:py-10" style={{ scrollbarWidth: "none" }}>
 
       {/* CARD */}
       <div className="flex w-full max-w-xl flex-col rounded-2xl bg-white shadow-lg">
@@ -164,7 +164,7 @@ const AddProduct = () => {
         ) : (
         <form
           onSubmit={handleSubmit}
-          className="flex-1 space-y-5 overflow-y-auto p-5 sm:p-6" style={{scrollbarWidth:"none"}}
+          className="flex-1 space-y-5 p-5 sm:p-6"
         >
 
           {/* Title */}
@@ -279,7 +279,7 @@ const AddProduct = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg text-white font-medium transition ${
+            className={`sticky bottom-3 z-10 w-full rounded-lg py-3 text-white font-medium shadow-lg transition ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-500 hover:bg-blue-600"
