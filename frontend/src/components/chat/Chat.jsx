@@ -12,7 +12,7 @@ const formatTime = (timestamp) => {
 }
 
 const Chat = () => {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const location = useLocation()
   const initialPartner = location.state?.chatPartner || null
   const initialId = location.state?.chatWith || new URLSearchParams(location.search).get('chatWith') || null
@@ -28,6 +28,8 @@ const Chat = () => {
   const [showAllProfiles, setShowAllProfiles] = useState(false)
   const [showChatWindow, setShowChatWindow] = useState(!!initialId)
   const socketRef = useRef(null)
+  const activeIdRef = useRef(activeId)
+  const messagesEndRef = useRef(null)
 
   const activeContact = useMemo(
     () => contacts.find((contact) => contact._id === activeId),
@@ -104,10 +106,18 @@ const Chat = () => {
   }, [activeId, contacts, user])
 
   useEffect(() => {
-    if (!user) return
+    activeIdRef.current = activeId
+  }, [activeId])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    if (!user || !token) return
 
     const socket = io(SOCKET_SERVER_URL, {
-      auth: { userId: user.id },
+      auth: { token },
       transports: ['websocket'],
       withCredentials: true,
     })
@@ -129,7 +139,7 @@ const Chat = () => {
         const exists = prev.some((item) => item._id === message._id)
         if (exists) return prev
 
-        if (message.by === activeId || message.to === activeId) {
+        if (message.by === activeIdRef.current || message.to === activeIdRef.current) {
           return [...prev, message]
         }
 
@@ -141,11 +151,15 @@ const Chat = () => {
       console.error('Chat socket connect error', error)
     })
 
+    socket.on('message_error', (error) => {
+      console.error('Chat message error', error)
+    })
+
     return () => {
       socket.disconnect()
       socketRef.current = null
     }
-  }, [user, activeId])
+  }, [user, token])
 
   useEffect(() => {
     const loadConversation = async () => {
@@ -167,7 +181,7 @@ const Chat = () => {
   }, [activeId])
 
   const handleSend = () => {
-    if (!draft.trim() || !activeId || !socketRef.current) return
+    if (!draft.trim() || !activeId || !socketRef.current?.connected) return
 
     socketRef.current.emit('private_message', {
       to: activeId,
@@ -181,16 +195,16 @@ const Chat = () => {
   const isLoading = showAllProfiles ? loadingUsers : loadingContacts
 
   return (
-    <div className='mx-auto flex min-h-[80vh] w-full max-w-[1200px] gap-4 p-4 lg:flex-row'>
+    <div className='mx-auto flex min-h-[80vh] w-full max-w-[1200px] flex-col gap-3 p-2 sm:p-4 lg:flex-row'>
       {/* Contact List - Hidden on mobile if chat window is open */}
-      <div className={`w-full rounded-2xl border border-slate-200 bg-white shadow-sm lg:w-[320px] ${showChatWindow ? 'hidden lg:block' : 'block'}`}>
+      <div className={`w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm lg:w-[320px] ${showChatWindow ? 'hidden lg:block' : 'block'}`}>
         <div className='flex items-center justify-between border-b border-slate-200 px-4 py-4'>
           <div className='text-lg font-semibold'>
             {showAllProfiles ? 'Initiated Chats' : 'Chats'}
           </div>
           <button
             onClick={() => setShowAllProfiles(!showAllProfiles)}
-            className='flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition hover:bg-slate-200'
+            className='flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition hover:bg-slate-200'
             aria-label={showAllProfiles ? 'Show chats' : 'Show initiated chats'}
           >
             <i className={`fa-solid ${showAllProfiles ? 'fa-comments' : 'fa-share'}`}></i>
@@ -209,7 +223,7 @@ const Chat = () => {
                 }}
                 className={`flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left transition ${contact._id === activeId ? 'bg-slate-100' : 'hover:bg-slate-50'}`}
               >
-                <span className='flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold uppercase text-slate-700'>
+                <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold uppercase text-slate-700'>
                   {contact.username?.charAt(0) || '?'}
                 </span>
                 <div className='flex-1 min-w-0'>
@@ -230,37 +244,37 @@ const Chat = () => {
       </div>
 
       {/* Chat Window - Hidden on mobile if contact list is shown */}
-      <div className={`flex-1 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${showChatWindow ? 'block' : 'hidden lg:block'}`}>
-        <div className='border-b border-slate-200 px-6 py-4'>
+      <div className={`min-w-0 flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm ${showChatWindow ? 'block' : 'hidden lg:block'}`}>
+        <div className='border-b border-slate-200 px-4 py-4 sm:px-6'>
           <div className='flex items-center gap-3'>
             <button
               onClick={() => setShowChatWindow(false)}
-              className='flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100 lg:hidden'
+              className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg hover:bg-slate-100 lg:hidden'
               aria-label='Back to contacts'
             >
               <i className='fa-solid fa-arrow-left'></i>
             </button>
-            <div className='flex-1'>
-              <div className='text-lg font-semibold'>
+            <div className='min-w-0 flex-1'>
+              <div className='truncate text-lg font-semibold'>
                 {activeContact ? activeContact.username : 'Select a contact'}
               </div>
-              <div className='text-sm text-slate-500'>
+              <div className='truncate text-sm text-slate-500'>
                 {activeContact ? (activeUsers.includes(activeId) ? 'Online' : 'Offline') : 'Tap a contact to start chatting'}
               </div>
             </div>
           </div>
         </div>
 
-        <div className='flex h-[calc(100vh-16rem)] flex-col sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-16rem)]'>
-          <div className='flex-1 overflow-y-auto px-6 py-4'>
+        <div className='flex h-[calc(100vh-12rem)] min-h-[420px] flex-col sm:h-[calc(100vh-14rem)] lg:h-[calc(100vh-16rem)]'>
+          <div className='flex-1 overflow-y-auto px-3 py-4 sm:px-6'>
             {messages.length ? (
               messages.map((message) => {
                 const isMine = message.by === user.id
                 return (
                   <div key={message._id} className={`mb-3 flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${isMine ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-900'}`}>
-                      <div>{message.message}</div>
-                      <div className='mt-2 text-right text-[10px] text-slate-500'>{formatTime(message.createdAt)}</div>
+                    <div className={`max-w-[88%] overflow-hidden rounded-2xl px-4 py-3 text-sm sm:max-w-[75%] ${isMine ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                      <div className='break-words'>{message.message}</div>
+                      <div className={`mt-2 text-right text-[10px] ${isMine ? 'text-blue-100' : 'text-slate-500'}`}>{formatTime(message.createdAt)}</div>
                     </div>
                   </div>
                 )
@@ -268,9 +282,10 @@ const Chat = () => {
             ) : (
               <div className='mt-16 text-center text-sm text-slate-500'>No messages yet. Send the first message.</div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
-          <div className='border-t border-slate-200 bg-slate-50 px-6 py-4'>
+          <div className='border-t border-slate-200 bg-slate-50 px-3 py-3 sm:px-6 sm:py-4'>
             <div className='flex flex-col gap-3 sm:flex-row'>
               <input
                 value={draft}
@@ -287,8 +302,8 @@ const Chat = () => {
               />
               <button
                 onClick={handleSend}
-                disabled={!activeContact || !draft.trim()}
-                className='inline-flex h-14 items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto'
+                disabled={!activeContact || !draft.trim() || !socketRef.current?.connected}
+                className='inline-flex h-12 w-full items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition enabled:hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 sm:h-14 sm:w-auto'
               >
                 Send
               </button>

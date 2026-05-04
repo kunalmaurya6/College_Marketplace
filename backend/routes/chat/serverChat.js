@@ -1,7 +1,30 @@
 import { Server } from 'socket.io'
+import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
+import User from '../../models/model/user.js'
 import chatModel from '../../models/model/chatModel.js'
 
 const activeUsers = new Map();
+
+const addActiveSocket = (userId, socketId) => {
+    const sockets = activeUsers.get(userId) || new Set();
+    sockets.add(socketId);
+    activeUsers.set(userId, sockets);
+};
+
+const removeActiveSocket = (userId, socketId) => {
+    const sockets = activeUsers.get(userId);
+    if (!sockets) return;
+
+    sockets.delete(socketId);
+    if (sockets.size) {
+        activeUsers.set(userId, sockets);
+    } else {
+        activeUsers.delete(userId);
+    }
+};
+
+const getActiveUserIds = () => Array.from(activeUsers.keys());
 
 const chatServer = (appServer) => {
     const io = new Server(appServer, {
@@ -12,41 +35,64 @@ const chatServer = (appServer) => {
         },
     });
 
-    io.on('connection', (socket) => {
-        const { userId } = socket.handshake.auth;
+    io.on('connection', async (socket) => {
+        const { token } = socket.handshake.auth || {};
 
-        if (!userId) {
+        if (!token) {
+            return socket.disconnect(true);
+        }
+
+        let userId;
+        try {
+            const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+            const user = await User.findById(decoded.id).select('_id');
+
+            if (!user) {
+                return socket.disconnect(true);
+            }
+
+            userId = user._id.toString();
+        } catch (error) {
             return socket.disconnect(true);
         }
 
         socket.join(userId);
-        activeUsers.set(userId, socket.id);
-        io.emit('active_users', Array.from(activeUsers.keys()));
+        addActiveSocket(userId, socket.id);
+        io.emit('active_users', getActiveUserIds());
 
         socket.on('private_message', async ({ to, message }) => {
-            if (!to || !message) return;
+            const text = typeof message === 'string' ? message.trim() : '';
 
-            const chat = await chatModel.create({
-                by: userId,
-                to,
-                message,
-            });
+            if (!mongoose.Types.ObjectId.isValid(to) || !text) {
+                socket.emit('message_error', { message: 'Valid receiver and message text are required' });
+                return;
+            }
 
-            const event = {
-                _id: chat._id,
-                by: chat.by,
-                to: chat.to,
-                message: chat.message,
-                createdAt: chat.createdAt,
-            };
+            try {
+                const chat = await chatModel.create({
+                    by: userId,
+                    to,
+                    message: text,
+                });
 
-            io.to(to).emit('private_message', event);
-            socket.emit('private_message', event);
+                const event = {
+                    _id: chat._id.toString(),
+                    by: chat.by.toString(),
+                    to: chat.to.toString(),
+                    message: chat.message,
+                    createdAt: chat.createdAt,
+                };
+
+                io.to(to).emit('private_message', event);
+                socket.emit('private_message', event);
+            } catch (error) {
+                socket.emit('message_error', { message: 'Unable to send message' });
+            }
         });
 
         socket.on('disconnect', () => {
-            activeUsers.delete(userId);
-            io.emit('active_users', Array.from(activeUsers.keys()));
+            removeActiveSocket(userId, socket.id);
+            io.emit('active_users', getActiveUserIds());
         });
     });
 };
