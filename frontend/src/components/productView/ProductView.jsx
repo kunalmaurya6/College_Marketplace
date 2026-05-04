@@ -289,9 +289,22 @@ const ProductView = () => {
             </div>
           </div>
 
-          <div className={`mt-7 grid gap-4 ${isSellerView ? "" : "sm:grid-cols-2"}`}>
+          <div className={`mt-7 grid gap-4 ${isSellerView ? '' : 'sm:grid-cols-2'}`}>
             <button
               type="button"
+              onClick={() => {
+                if (!product?.seller?._id) return
+                navigate('/chat', {
+                  state: {
+                    chatWith: product.seller._id,
+                    chatPartner: {
+                      _id: product.seller._id,
+                      username: product.seller.username,
+                      email: product.seller.email,
+                    },
+                  },
+                })
+              }}
               className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-blue-600 px-5 text-base font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700"
             >
               <i className="fa-regular fa-message"></i>
@@ -300,12 +313,12 @@ const ProductView = () => {
             {!isSellerView && (
               <button
                 type="button"
-                onClick={isInCart ? () => navigate("/cart") : handleAddToCart}
+                onClick={isInCart ? () => navigate('/cart') : handleAddToCart}
                 disabled={addingToCart}
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-emerald-600 px-5 text-base font-bold text-white shadow-lg shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <i className="fa-solid fa-cart-shopping"></i>
-                {addingToCart ? "Adding..." : isInCart ? "See Cart" : "Add to Cart"}
+                {addingToCart ? 'Adding...' : isInCart ? 'See Cart' : 'Add to Cart'}
               </button>
             )}
           </div>

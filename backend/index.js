@@ -10,14 +10,11 @@ import cookieParser from 'cookie-parser'
 
 const app = express()
 
-const server=httpServer.createServer(app);
+const server = httpServer.createServer(app);
 
 chatServer(server);
 
 const PORT = process.env.PORT
-
-
-chatServer(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -50,5 +47,5 @@ app.use((err, req, res, next) => {
 export default app;
 
 //server.listen(PORT, async () => {
-  //  console.log("Server running on: ", PORT);
+//   console.log("Server running on: ", PORT);
 //})
