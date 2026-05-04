@@ -1,10 +1,10 @@
 import React from 'react'
-import CommingSoon from '../../utils/CommingSoon'
+import Chat from '../../chat/Chat'
 
 const Messages = () => {
   return (
     <div className='w-full h-full'>
-      <CommingSoon/>
+      <Chat />
     </div>
   )
 }

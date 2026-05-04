@@ -5,7 +5,10 @@ const chatSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-
+    to: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     message: {
         type: String,
         required: true,
