@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://apana-market.vercel.app",
     credentials: true
 }));
 
@@ -44,8 +44,8 @@ app.use((err, req, res, next) => {
     });
 });
 
-// export default app;
+export default app;
 
-server.listen(PORT, async () => {
-   console.log("Server running on: ", PORT);
-})
+//server.listen(PORT, async () => {
+//   console.log("Server running on: ", PORT);
+//})
