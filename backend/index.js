@@ -44,8 +44,8 @@ app.use((err, req, res, next) => {
     });
 });
 
-export default app;
+//export default app;
 
-// server.listen(PORT, async () => {
-//   console.log("Server running on: ", PORT);
-// })
+server.listen(PORT, async () => {
+   console.log("Server running on: ", PORT);
+ })
