@@ -91,7 +91,7 @@ export class ApiError extends Error {
 }
 
 export const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "https://apanamarket.vercel.app/api"
+  import.meta.env.VITE_API_BASE_URL || "https://college-marketplace-26dv.onrender.com/api"
 ).replace(/\/+$/, "");
 
 export const AUTH_TOKEN_KEY = "collegeMarketplaceAuthToken";
