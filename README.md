@@ -1,55 +1,106 @@
-﻿# ApanaMart 🎓🛒
+# ApanaMart 🎓🛒
 
  <img width="542" height="165" alt="logo" src="https://github.com/user-attachments/assets/ee9a3fd6-7e3a-4905-bbb4-4edd3f991af6" />
 
-## 1. Project Title & Tagline
-**ApanaMart**  
-*A MERN-stack marketplace connecting students within their campus.*
+ApanaMart is a MERN-stack marketplace for college students to buy, sell, save, and chat about pre-owned campus essentials such as books, electronics, fashion items, home decor, and other useful products.
 
----
+## Features
 
-## 2. Problem Statement
-College students often have textbooks, electronics, and tools that go unused once a semester ends. These items are still valuable but often sit idle or get thrown away. At the same time, other students struggle to afford these essential items at retail prices. There is currently no dedicated, secure platform for students to trade these resources directly with their peers on campus.
+- Student authentication with JWT, HTTP-only cookie support, and local token storage
+- Product browsing with approved and available listings
+- Seller dashboard for adding, editing, deleting, and marking products as sold
+- Product image uploads through Cloudinary
+- Admin review flow for approving, rejecting, filtering, and deleting listings
+- Cart and favorites support for buyers
+- Real-time private chat with Socket.IO
+- Protected user, seller, and admin routes
 
----
+## Tech Stack
 
-## 3. Solution
-**ApanaMart** is a full-stack e-commerce platform built using the **MERN stack** (MongoDB, Express, React, Node.js) specifically designed for the campus community. 
+| Layer | Tools |
+| --- | --- |
+| Frontend | React 19, Vite, React Router, Tailwind CSS, Socket.IO Client |
+| Backend | Node.js, Express 5, MongoDB, Mongoose, Socket.IO |
+| Auth & Validation | JWT, bcrypt, Joi |
+| Uploads | Multer, Cloudinary |
+| Deployment Config | Vercel |
 
-- **Peer-to-Peer Trading:** Enables students to list unused items and find buyers within the same campus.
-- **Budget-Friendly:** Reduces the financial burden on students by providing access to affordable, pre-owned academic materials.
-- **Simplified Interface:** A clean, intuitive UI that makes uploading products and searching for deals fast and efficient.
+## Project Structure
 
----
+```text
+College_Marketplace/
+├── backend/
+│   ├── index.js
+│   ├── models/
+│   ├── routes/
+│   └── utils/
+├── frontend/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── context/
+│   │   └── utils/
+│   └── vite.config.js
+└── README.md
+```
 
-## 4. Installation
+## Prerequisites
 
-Clone the repository and install dependencies for both the frontend and backend.
+- Node.js 18 or newer
+- npm
+- MongoDB database connection string
+- Cloudinary account for product image uploads
+
+
+## Installation
+
+Clone the repository and install dependencies for both apps:
 
 ```bash
-# Clone the repository
-git clone <your-repository-url>
-cd ApanaMart
+git clone https://github.com/kunalmaurya6/College_Marketplace.git
+cd College_Marketplace
 
-# Install backend dependencies
 cd backend
 npm install
 
-# Install frontend dependencies
 cd ../frontend
 npm install
 ```
 
-### 5. Running the Project
+## Running Locally
 
-To run the application locally, you need to start both the Node/Express server and the React development server.
+Start the backend API:
+
 ```bash
-# Start the Backend (Server)
-# Open a terminal and navigate to the backend directory:
 cd backend
-npm run dev
+npm start
+```
 
-# Start the Frontend (Client)
-# Open a terminal and navigate to the backend directory:
-cd backend
+The backend uses the `PORT` value from `backend/.env`, for example `http://localhost:5000`.
+
+Start the frontend in a second terminal:
+
+```bash
+cd frontend
 npm run dev
+```
+
+The Vite app runs at `http://localhost:5173`. The backend CORS configuration is currently set up for this local frontend URL.
+
+## Available Scripts
+
+Backend:
+
+```bash
+npm start
+npm run vercel-start
+```
+
+Frontend:
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
