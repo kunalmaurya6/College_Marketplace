@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
     origin: (origin,callback)=>{
-        if(!origin || ["https://apana-market.vercel.app","https://frontend.d58esspqmko58.amplifyapp.com"].includes(origin)){
+        if(!origin || ["https://apana-market.vercel.app","https://main.d58esspqmko58.amplifyapp.com"].includes(origin)){
             callback(null,true);
         }
         else {
