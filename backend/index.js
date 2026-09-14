@@ -20,7 +20,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: "https://apana-market.vercel.app",
+    origin: (origin,callback)=>{
+        if(!origin || ["https://apana-market.vercel.app","https://frontend.d58esspqmko58.amplifyapp.com"].includes(origin)){
+            callback(null,true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     credentials: true
 }));
 
